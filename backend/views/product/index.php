@@ -27,18 +27,50 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
+            [
+                'attribute' => 'id',
+                'contentOptions' => [
+                    'style' => 'width: 60px'
+                ]
+            ],
+            [
+                'label' => 'Image',
+                'attribute' => 'image',
+                'content' => function ($model) {
+                    /** @var \common\models\Product $model */
+                    return Html::img($model->getImageUrl(), ['style' => 'width: 50px']);
+                }
+            ],
             'name',
-            'description',
-            'image',
-            'price',
-            //'status',
-            //'created_at',
-            //'updated_at',
-            //'created_by',
-            //'updated_by',
+                        'price:currency',
+            [
+                'attribute' => 'status',
+                'content' => function ($model) {
+                    /** @var \common\models\Product $model */
+                    return Html::tag('span', $model->status ? 'Active' : 'Draft', [
+                        'class' => $model->status ? 'badge badge-success' : 'badge badge-danger'
+                    ]);
+                }
+            ],
+            [
+                'attribute' => 'created_at',
+                'format' => ['datetime'],
+                'contentOptions' => ['style' => 'white-space: nowrap']
+            ],
+            [
+                'attribute' => 'updated_at',
+                'format' => ['datetime'],
+                'contentOptions' => ['style' => 'white-space: nowrap']
+            ],
+            // 'description',
+            // 'image',
+            // ['class' => 'common\grid\ActionColumn'],
+            // 'price',
+            // //'status',
+            // //'created_at',
+            // //'updated_at',
+            // //'created_by',
+            // //'updated_by',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Product $model, $key, $index, $column) {

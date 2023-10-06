@@ -22,6 +22,10 @@ class ProductQuery extends \yii\db\ActiveQuery
     {
         return parent::all($db);
     }
+    public function published()
+    {
+        return $this->andWhere(['status' => 1]);
+    }
 
     /**
      * {@inheritdoc}
