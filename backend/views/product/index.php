@@ -7,10 +7,10 @@ use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /** @var yii\web\View $this */
-/** @var backend\models\search\ProductsSearch $searchModel */
+/** @var backend\models\search\ProductSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Products';
+$this->title = 'Product';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="product-index">
@@ -28,10 +28,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             [
-                'attribute' => 'id',
-                'contentOptions' => [
-                    'style' => 'width: 60px'
-                ]
+                // 'label' => '',
+                // 'attribute' => 'id',
+                // 'contentOptions' => [
+                //     'style' => 'width: 60px'
+                // ]
             ],
             [
                 'label' => 'Image',

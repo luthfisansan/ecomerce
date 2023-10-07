@@ -8,7 +8,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\helpers\FileHelper;
 // use yii\web\UploadedFile;
 /**
- * This is the model class for table "products".
+ * This is the model class for table "product".
  *
  * @property int $id
  * @property string $name

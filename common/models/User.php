@@ -227,7 +227,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getAddresses()
     {
-        return $this->hasMany(UserAddress::class, ['user_id' => 'id']);
+        return $this->hasMany(OrderAddress::class, ['user_id' => 'id']);
     }
 
     /**
@@ -236,7 +236,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function getAddress(): ?UserAddress
     {
-        $address = $this->addresses[0] ?? new UserAddress();
+        $address = $this->addresses[0] ?? new OrderAddress();
         $address->user_id = $this->id;
         return $address;
     }

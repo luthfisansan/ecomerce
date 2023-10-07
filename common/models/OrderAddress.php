@@ -17,7 +17,7 @@ use Yii;
  *
  * @property User $user
  */
-class UserAddress extends \yii\db\ActiveRecord
+class OrderAddress extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}

@@ -9,7 +9,7 @@ use common\models\Product;
 /**
  * ProductsSearch represents the model behind the search form of `common\models\Product`.
  */
-class ProductsSearch extends Product
+class ProductSearch extends Product
 {
     /**
      * {@inheritdoc}
