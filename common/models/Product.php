@@ -39,6 +39,7 @@ class Product extends \yii\db\ActiveRecord
     {
         return 'products';
     }
+    
 
     /**
      * {@inheritdoc}
@@ -140,7 +141,14 @@ class Product extends \yii\db\ActiveRecord
 
     public function getImageUrl()
     {
-        return Yii::$app->params['frontendUrl'] . '/storage' . $this->image;
+        return self::formatImageUrl($this->image);
+    }
+
+    public static function formatImageUrl($imagePath)
+    {
+        if ($imagePath) {
+            return Yii::$app->params['frontendUrl'] . '/storage' . $imagePath;
+        }
     }
     /**
      * Get short version of the description

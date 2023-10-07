@@ -11,6 +11,8 @@ use yii\web\IdentityInterface;
 /**
  * User model
  *
+ *  @property string $firstname
+ * @property string $lastname
  * @property integer $id
  * @property string $username
  * @property string $password_hash
@@ -28,7 +30,8 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
-
+    public $password;
+    public $passwordConfirm;
 
     /**
      * {@inheritdoc}
@@ -36,6 +39,12 @@ class User extends ActiveRecord implements IdentityInterface
     public static function tableName()
     {
         return '{{%user}}';
+    }
+    public function getDisplayName()
+    {
+        // return $this->username
+        $fullName = trim($this->firstname.' '.$this->lastname);
+        return $fullName ?: $this->email;
     }
 
     /**
@@ -54,6 +63,8 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
+            [['firstname', 'lastname', 'username', 'email'], 'required'],
+            [['firstname', 'lastname', 'username', 'email'], 'string', 'max' => 255],
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
         ];
@@ -209,5 +220,24 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+     /**
+     * @return mixed
+     * @author Zura Sekhniashvili <zurasekhniashvili@gmail.com>
+     */
+    public function getAddresses()
+    {
+        return $this->hasMany(UserAddress::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \common\models\UserAddress|null
+     * @author Zura Sekhniashvili <zurasekhniashvili@gmail.com>
+     */
+    public function getAddress(): ?UserAddress
+    {
+        $address = $this->addresses[0] ?? new UserAddress();
+        $address->user_id = $this->id;
+        return $address;
     }
 }

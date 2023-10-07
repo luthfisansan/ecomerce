@@ -6,6 +6,7 @@ use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use common\models\Product;
+use common\models\UserAddress;
 use yii\data\ActiveDataProvider;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -21,7 +22,7 @@ use frontend\models\ContactForm;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends \frontend\base\Controller
 {
     /**
      * {@inheritdoc}
