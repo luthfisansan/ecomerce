@@ -25,6 +25,7 @@ use Yii;
 class Order extends \yii\db\ActiveRecord
 {
     const STATUS_DRAFT = 0;
+    public $total_price;
     /**
      * {@inheritdoc}
      */
