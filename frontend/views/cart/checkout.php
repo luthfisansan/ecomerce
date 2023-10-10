@@ -10,10 +10,6 @@ use yii\bootstrap4\ActiveForm;
 ?>
 <?php $form = ActiveForm::begin([
     'id' => 'checkout-form',
-<<<<<<< HEAD
-    'action' => ['cart/checkout'],
-=======
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 ]); ?>
 
 <div class="row">

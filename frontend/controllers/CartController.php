@@ -2,10 +2,7 @@
 
 namespace frontend\controllers;
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 use common\models\CartItem;
 use common\models\Order;
 use common\models\OrderAddress;
@@ -13,13 +10,6 @@ use common\models\Product;
 use Yii;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
-<<<<<<< HEAD
-use yii\helpers\VarDumper;
-use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
-use yii\web\Response;
-
-=======
 // use yii\web\Controller;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
@@ -32,7 +22,6 @@ use yii\web\BadRequestHttpException;
  * Class CartController
  *
  */
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 class CartController extends \frontend\base\Controller
 {
     public function behaviors()
@@ -40,11 +29,7 @@ class CartController extends \frontend\base\Controller
         return [
             [
                 'class' => ContentNegotiator::class,
-<<<<<<< HEAD
-                'only' => ['add', 'create-order', 'submit-payment'],
-=======
                 'only' => ['add', 'create-order', 'submit-payment', 'change-quantity'],
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -53,33 +38,13 @@ class CartController extends \frontend\base\Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST', 'DELETE'],
-                    'create-order' => ['POST'],
-                ],
-            ],
+                ]
+            ]
         ];
     }
 
     public function actionIndex()
     {
-<<<<<<< HEAD
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect(['site/login']);
-        }
-
-        $userId = Yii::$app->user->id;
-        $cartItems = CartItem::getItemsForUser($userId);
-        $order = new Order();
-        $orderAddress = new OrderAddress();
-        $productQuantity = CartItem::getTotalQuantityForUser($userId);
-        $totalPrice = CartItem::getTotalPriceForUser($userId);
-
-        return $this->render('index', [
-            'items' => $cartItems,
-            'order' => $order,
-            'orderAddress' => $orderAddress,
-            'productQuantity' => $productQuantity,
-            'totalPrice' => $totalPrice,
-=======
         if (\Yii::$app->user->isGuest) {
             $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
         } else {
@@ -88,25 +53,20 @@ class CartController extends \frontend\base\Controller
 
         return $this->render('index', [
             'items' => $cartItems
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
         ]);
     }
 
     public function actionAdd()
     {
-        $id = Yii::$app->request->post('id');
+        $id = \Yii::$app->request->post('id');
         $product = Product::find()->id($id)->published()->one();
         if (!$product) {
             throw new NotFoundHttpException("Product does not exist");
         }
-<<<<<<< HEAD
-=======
 
         if (\Yii::$app->user->isGuest) {
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 
-        if (Yii::$app->user->isGuest) {
-            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
             $found = false;
             foreach ($cartItems as &$item) {
                 if ($item['id'] == $id) {
@@ -122,18 +82,14 @@ class CartController extends \frontend\base\Controller
                     'image' => $product->image,
                     'price' => $product->price,
                     'quantity' => 1,
-                    'total_price' => $product->price,
+                    'total_price' => $product->price
                 ];
                 $cartItems[] = $cartItem;
             }
 
-<<<<<<< HEAD
-            Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
-=======
             \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
         } else {
-            $userId = Yii::$app->user->id;
+            $userId = \Yii::$app->user->id;
             $cartItem = CartItem::find()->userId($userId)->productId($id)->one();
             if ($cartItem) {
                 $cartItem->quantity++;
@@ -145,12 +101,12 @@ class CartController extends \frontend\base\Controller
             }
             if ($cartItem->save()) {
                 return [
-                    'success' => true,
+                    'success' => true
                 ];
             } else {
                 return [
                     'success' => false,
-                    'errors' => $cartItem->errors,
+                    'errors' => $cartItem->errors
                 ];
             }
         }
@@ -158,20 +114,15 @@ class CartController extends \frontend\base\Controller
 
     public function actionDelete($id)
     {
-<<<<<<< HEAD
-        if (Yii::$app->user->isGuest) {
-            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
-=======
         if (isGuest()) {
             $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
             foreach ($cartItems as $i => $cartItem) {
                 if ($cartItem['id'] == $id) {
                     array_splice($cartItems, $i, 1);
                     break;
                 }
             }
-            Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+            \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
         } else {
             CartItem::deleteAll(['product_id' => $id, 'created_by' => currUserId()]);
         }
@@ -181,21 +132,21 @@ class CartController extends \frontend\base\Controller
 
     public function actionChangeQuantity()
     {
-        $id = Yii::$app->request->post('id');
+        $id = \Yii::$app->request->post('id');
         $product = Product::find()->id($id)->published()->one();
         if (!$product) {
             throw new NotFoundHttpException("Product does not exist");
         }
-        $quantity = Yii::$app->request->post('quantity');
-        if (Yii::$app->user->isGuest) {
-            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+        $quantity = \Yii::$app->request->post('quantity');
+        if (isGuest()) {
+            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
             foreach ($cartItems as &$cartItem) {
                 if ($cartItem['id'] === $id) {
                     $cartItem['quantity'] = $quantity;
                     break;
                 }
             }
-            Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+            \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
         } else {
             $cartItem = CartItem::find()->userId(Yii::$app->user->id)->productId($id)->one();
             if ($cartItem) {
@@ -204,73 +155,14 @@ class CartController extends \frontend\base\Controller
             }
         }
 
-<<<<<<< HEAD
-        return CartItem::getTotalQuantityForUser(Yii::$app->user->id);
-=======
         return [
             'quantity' => CartItem::getTotalQuantityForUser(Yii::$app->user->id),
             'price' => Yii::$app->formatter->asCurrency(CartItem::getTotalPriceForItemForUser($id,Yii::$app->user->id))
         ];
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
     }
 
     public function actionCheckout()
     {
-<<<<<<< HEAD
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect(['site/login']);
-        }
-    
-        $userId = Yii::$app->user->id;
-        $cartItems = CartItem::getItemsForUser($userId);
-    
-        if (empty($cartItems)) {
-            return $this->redirect([Yii::$app->homeUrl]);
-        }
-    
-        $order = new Order();
-    
-        if ($order->load(Yii::$app->request->post())) {
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                $order->total_price = CartItem::getTotalPriceForUser($userId);
-                $order->status = Order::STATUS_DRAFT;
-                $order->created_at = time();
-                $order->created_by = $userId;
-    
-                if ($order->save()) {
-                    foreach ($cartItems as $cartItem) {
-                        $orderItem = new OrderItem();
-                        $orderItem->product_name = $cartItem['name'];
-                        $orderItem->product_id = $cartItem['id'];
-                        $orderItem->unit_price = $cartItem['price'];
-                        $orderItem->order_id = $order->id;
-                        $orderItem->quantity = $cartItem['quantity'];
-                        $orderItem->save();
-                    }
-    
-                    $orderAddress = new OrderAddress();
-                    $orderAddress->load(Yii::$app->request->post());
-                    $orderAddress->order_id = $order->id;
-                    $orderAddress->save();
-    
-                    // Hapus barang dari keranjang
-                    CartItem::clearCartItems($userId);
-    
-                    $transaction->commit();
-    
-                    return $this->render('pay-now', [
-                        'order' => $order,
-                    ]);
-                } else {
-                    $transaction->rollBack();
-                }
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-            }
-        }
-    
-=======
         $cartItems = CartItem::getItemsForUser(Yii::$app->user->id);
         $productQuantity = CartItem::getTotalQuantityForUser(Yii::$app->user->id);
         $totalPrice = CartItem::getTotalPriceForUser(Yii::$app->user->id);
@@ -319,20 +211,15 @@ class CartController extends \frontend\base\Controller
         $productQuantity = CartItem::getTotalQuantityForUser(Yii::$app->user->id);
         $totalPrice = CartItem::getTotalPriceForUser(Yii::$app->user->id);
 
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
         return $this->render('checkout', [
             'order' => $order,
+            'orderAddress' => $orderAddress,
             'cartItems' => $cartItems,
+            'productQuantity' => $productQuantity,
+            'totalPrice' => $totalPrice
         ]);
     }
-<<<<<<< HEAD
-    
-    
-
-}
-=======
 
 
 
 }
->>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
