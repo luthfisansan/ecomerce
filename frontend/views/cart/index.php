@@ -1,10 +1,4 @@
 <?php
-/**
- * User: TheCodeholic
- * Date: 12/12/2020
- * Time: 3:42 PM
- */
-/** @var array $items */
 ?>
 
 
@@ -34,11 +28,11 @@
                              style="width: 50px;"
                              alt="<?php echo $item['name'] ?>">
                     </td>
-                    <td><?php echo $item['price'] ?></td>
+                    <td><?php echo Yii::$app->formatter->asCurrency($item['price']) ?></td>
                     <td>
                         <input type="number" min="1" class="form-control item-quantity" style="width: 60px" value="<?php echo $item['quantity'] ?>">
                     </td>
-                    <td><?php echo $item['total_price'] ?></td>
+                    <td><?php echo Yii::$app->formatter->asCurrency($item['total_price']) ?></td>
                     <td>
                         <?php echo \yii\helpers\Html::a('Delete', ['/cart/delete', 'id' => $item['id']], [
                             'class' => 'btn btn-outline-danger btn-sm',
@@ -55,7 +49,7 @@
             <a href="<?php echo \yii\helpers\Url::to(['/cart/checkout']) ?>" class="btn btn-primary">Checkout</a>
         </div>
         <div class="card-footer text-right">
-            <strong>Total Harga Keseluruhan: $<?php echo $totalPrice; ?></strong>
+            <!-- <strong>Total Harga Keseluruhan:  -->
         </div>
         <?php else: ?>
 

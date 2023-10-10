@@ -1,9 +1,4 @@
 <?php
-/**
- * User: TheCodeholic
- * Date: 12/12/2020
- * Time: 3:25 PM
- */
 
 namespace frontend\controllers;
 

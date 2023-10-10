@@ -9,7 +9,7 @@
 use yii\bootstrap4\ActiveForm;
 ?>
 <?php $form = ActiveForm::begin([
-    'action' => [''],
+    'id' => 'checkout-form',
 ]); ?>
 
 <div class="row">

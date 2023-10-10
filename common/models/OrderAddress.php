@@ -5,17 +5,16 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "user_addresses".
+ * This is the model class for table "{{%order_addresses}}".
  *
- * @property int $id
- * @property int $user_id
+ * @property int $order_id
  * @property string $address
  * @property string $city
  * @property string $state
  * @property string $country
  * @property string|null $zipcode
  *
- * @property User $user
+ * @property Order $order
  */
 class OrderAddress extends \yii\db\ActiveRecord
 {
@@ -24,7 +23,7 @@ class OrderAddress extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'user_addresses';
+        return '{{%order_addresses}}';
     }
 
     /**
@@ -33,11 +32,11 @@ class OrderAddress extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // [['user_id', 'address', 'city', 'state', 'country'], 'required']s,
-            [['user_id'], 'default', 'value' => null],
-            [['user_id'], 'integer'],
+            [['order_id', 'address', 'city', 'state', 'country'], 'required'],
+            [['order_id'], 'integer'],
             [['address', 'city', 'state', 'country', 'zipcode'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['order_id'], 'unique'],
+            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::className(), 'targetAttribute' => ['order_id' => 'id']],
         ];
     }
 
@@ -47,8 +46,7 @@ class OrderAddress extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'user_id' => 'User ID',
+            'order_id' => 'Order ID',
             'address' => 'Address',
             'city' => 'City',
             'state' => 'State',
@@ -58,21 +56,21 @@ class OrderAddress extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Gets query for [[Order]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderQuery
      */
-    public function getUser()
+    public function getOrder()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
+        return $this->hasOne(Order::className(), ['id' => 'order_id']);
     }
 
     /**
      * {@inheritdoc}
-     * @return \common\models\query\UserAddressQuery the active query used by this AR class.
+     * @return \common\models\query\OrderAddressQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new \common\models\query\UserAddressQuery(get_called_class());
+        return new \common\models\query\OrderAddressQuery(get_called_class());
     }
 }
