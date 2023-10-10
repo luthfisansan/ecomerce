@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "orders".
+ * This is the model class for table "{{%orders}}".
  *
  * @property int $id
  * @property float $total_price
@@ -16,22 +16,21 @@ use Yii;
  * @property string|null $transaction_id
  * @property int|null $created_at
  * @property int|null $created_by
- * @property string|null $paypal_order_id
  *
- * @property User $createdBy
  * @property OrderAddresses $orderAddresses
  * @property OrderItems[] $orderItems
+ * @property User $createdBy
  */
 class Order extends \yii\db\ActiveRecord
 {
     const STATUS_DRAFT = 0;
-    public $total_price;
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'orders';
+        return '{{%orders}}';
     }
 
     /**
@@ -42,11 +41,10 @@ class Order extends \yii\db\ActiveRecord
         return [
             [['total_price', 'status', 'firstname', 'lastname', 'email'], 'required'],
             [['total_price'], 'number'],
-            [['status', 'created_at', 'created_by'], 'default', 'value' => null],
             [['status', 'created_at', 'created_by'], 'integer'],
             [['firstname', 'lastname'], 'string', 'max' => 45],
-            [['email', 'transaction_id', 'paypal_order_id'], 'string', 'max' => 255],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
+            [['email', 'transaction_id'], 'string', 'max' => 255],
+            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
     }
 
@@ -65,8 +63,27 @@ class Order extends \yii\db\ActiveRecord
             'transaction_id' => 'Transaction ID',
             'created_at' => 'Created At',
             'created_by' => 'Created By',
-            'paypal_order_id' => 'Paypal Order ID',
         ];
+    }
+
+    /**
+     * Gets query for [[OrderAddresses]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressesQuery
+     */
+    public function getOrderAddress()
+    {
+        return $this->hasOne(OrderAddress::className(), ['order_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[OrderItem]].
+     *
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemQuery
+     */
+    public function getOrderItems()
+    {
+        return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
     }
 
     /**
@@ -76,27 +93,7 @@ class Order extends \yii\db\ActiveRecord
      */
     public function getCreatedBy()
     {
-        return $this->hasOne(User::class, ['id' => 'created_by']);
-    }
-
-    /**
-     * Gets query for [[OrderAddresses]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressesQuery
-     */
-    public function getOrderAddresses()
-    {
-        return $this->hasOne(OrderAddresses::class, ['order_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[OrderItems]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemsQuery
-     */
-    public function getOrderItems()
-    {
-        return $this->hasMany(OrderItems::class, ['order_id' => 'id']);
+        return $this->hasOne(User::className(), ['id' => 'created_by']);
     }
 
     /**
@@ -107,4 +104,39 @@ class Order extends \yii\db\ActiveRecord
     {
         return new \common\models\query\OrderQuery(get_called_class());
     }
+    public function saveAddress($postData)
+    {
+        $orderAddress = new OrderAddress();
+        $orderAddress->order_id = $this->id;
+        if ($orderAddress->load($postData) && $orderAddress->save()) {
+            return true;
+        }
+        throw new Exception("Could not save order address: " . implode("<br>", $orderAddress->getFirstErrors()));
+    }
+
+    public function saveOrderItems()
+    {
+        $cartItems = CartItem::getItemsForUser(Yii::$app->user->id);
+        foreach ($cartItems as $cartItem) {
+            $orderItem = new OrderItem();
+            $orderItem->product_name = $cartItem['name'];
+            $orderItem->product_id = $cartItem['id'];
+            $orderItem->unit_price = $cartItem['price'];
+            $orderItem->order_id = $this->id;
+            $orderItem->quantity = $cartItem['quantity'];
+            if (!$orderItem->save()) {
+                throw new Exception("Order item was not saved: " . implode('<br>', $orderItem->getFirstErrors()));
+            }
+        }
+
+        return true;
+    }
+
+    public function getItemsQuantity()
+    {
+        return $sum = CartItem::findBySql(
+            "SELECT SUM(quantity) FROM order_items WHERE order_id = :orderId", ['orderId' => $this->id]
+        )->scalar();
+    }
+
 }

@@ -1,9 +1,17 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 <?php
 /** @var \common\models\Order $order */
 
 $orderAddress = $order->orderAddress
 ?>
+<<<<<<< HEAD
 <!-- <script src="https://www.paypal.com/sdk/js?client-id=<?php echo param('paypalClientId') ?>"></script> -->
+=======
+<!--  -->
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 
 <h3>Order #<?php echo $order->id ?> summary: </h3>
 <hr>
@@ -91,6 +99,10 @@ $orderAddress = $order->orderAddress
 <script>
   paypal.Buttons({
     createOrder: function (data, actions) {
+<<<<<<< HEAD
+=======
+      // This function sets up the details of the transaction, including the amount and line item details.
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
       return actions.order.create({
         purchase_units: [{
           amount: {
@@ -101,6 +113,10 @@ $orderAddress = $order->orderAddress
     },
     onApprove: function (data, actions) {
       console.log(data, actions);
+<<<<<<< HEAD
+=======
+      // This function captures the funds from the transaction.
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
       return actions.order.capture().then(function (details) {
         console.log(details);
         const $form = $('#checkout-form');
@@ -130,4 +146,8 @@ $orderAddress = $order->orderAddress
       });
     }
   }).render('#paypal-button-container');
+<<<<<<< HEAD
+=======
+  // This function displays Smart Payment Buttons on your web page.
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 </script>

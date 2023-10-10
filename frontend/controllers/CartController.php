@@ -2,6 +2,10 @@
 
 namespace frontend\controllers;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 use common\models\CartItem;
 use common\models\Order;
 use common\models\OrderAddress;
@@ -9,11 +13,26 @@ use common\models\Product;
 use Yii;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
+<<<<<<< HEAD
 use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+=======
+// use yii\web\Controller;
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersGetRequest;
+use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\helpers\VarDumper;
+use yii\web\BadRequestHttpException;
+/**
+ * Class CartController
+ *
+ */
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 class CartController extends \frontend\base\Controller
 {
     public function behaviors()
@@ -21,7 +40,11 @@ class CartController extends \frontend\base\Controller
         return [
             [
                 'class' => ContentNegotiator::class,
+<<<<<<< HEAD
                 'only' => ['add', 'create-order', 'submit-payment'],
+=======
+                'only' => ['add', 'create-order', 'submit-payment', 'change-quantity'],
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                 ],
@@ -38,6 +61,7 @@ class CartController extends \frontend\base\Controller
 
     public function actionIndex()
     {
+<<<<<<< HEAD
         if (Yii::$app->user->isGuest) {
             return $this->redirect(['site/login']);
         }
@@ -55,6 +79,16 @@ class CartController extends \frontend\base\Controller
             'orderAddress' => $orderAddress,
             'productQuantity' => $productQuantity,
             'totalPrice' => $totalPrice,
+=======
+        if (\Yii::$app->user->isGuest) {
+            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+        } else {
+            $cartItems = CartItem::getItemsForUser(Yii::$app->user->id);
+        }
+
+        return $this->render('index', [
+            'items' => $cartItems
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
         ]);
     }
 
@@ -65,6 +99,11 @@ class CartController extends \frontend\base\Controller
         if (!$product) {
             throw new NotFoundHttpException("Product does not exist");
         }
+<<<<<<< HEAD
+=======
+
+        if (\Yii::$app->user->isGuest) {
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
 
         if (Yii::$app->user->isGuest) {
             $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
@@ -88,7 +127,11 @@ class CartController extends \frontend\base\Controller
                 $cartItems[] = $cartItem;
             }
 
+<<<<<<< HEAD
             Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+=======
+            \Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
         } else {
             $userId = Yii::$app->user->id;
             $cartItem = CartItem::find()->userId($userId)->productId($id)->one();
@@ -115,8 +158,13 @@ class CartController extends \frontend\base\Controller
 
     public function actionDelete($id)
     {
+<<<<<<< HEAD
         if (Yii::$app->user->isGuest) {
             $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+=======
+        if (isGuest()) {
+            $cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
             foreach ($cartItems as $i => $cartItem) {
                 if ($cartItem['id'] == $id) {
                     array_splice($cartItems, $i, 1);
@@ -125,7 +173,7 @@ class CartController extends \frontend\base\Controller
             }
             Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
         } else {
-            CartItem::deleteAll(['product_id' => $id, 'created_by' => Yii::$app->user->id]);
+            CartItem::deleteAll(['product_id' => $id, 'created_by' => currUserId()]);
         }
 
         return $this->redirect(['index']);
@@ -156,11 +204,19 @@ class CartController extends \frontend\base\Controller
             }
         }
 
+<<<<<<< HEAD
         return CartItem::getTotalQuantityForUser(Yii::$app->user->id);
+=======
+        return [
+            'quantity' => CartItem::getTotalQuantityForUser(Yii::$app->user->id),
+            'price' => Yii::$app->formatter->asCurrency(CartItem::getTotalPriceForItemForUser($id,Yii::$app->user->id))
+        ];
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
     }
 
     public function actionCheckout()
     {
+<<<<<<< HEAD
         if (Yii::$app->user->isGuest) {
             return $this->redirect(['site/login']);
         }
@@ -214,12 +270,69 @@ class CartController extends \frontend\base\Controller
             }
         }
     
+=======
+        $cartItems = CartItem::getItemsForUser(Yii::$app->user->id);
+        $productQuantity = CartItem::getTotalQuantityForUser(Yii::$app->user->id);
+        $totalPrice = CartItem::getTotalPriceForUser(Yii::$app->user->id);
+
+        if (empty($cartItems)) {
+            return $this->redirect([Yii::$app->homeUrl]);
+        }
+        $order = new Order();
+
+        $order->total_price = $totalPrice;
+        $order->status = Order::STATUS_DRAFT;
+        $order->created_at = time();
+        $order->created_by = Yii::$app->user->id;
+        $transaction = Yii::$app->db->beginTransaction();
+        if ($order->load(Yii::$app->request->post())
+            && $order->save()
+            && $order->saveAddress(Yii::$app->request->post())
+            && $order->saveOrderItems()) {
+            $transaction->commit();
+
+            CartItem::clearCartItems(Yii::$app->user->id);
+
+            return $this->render('pay-now', [
+                'order' => $order,
+            ]);
+        }
+        $orderAddress = new OrderAddress();
+        if (\Yii::$app->user->isGuest) {
+            /** @var \common\models\User $user */
+            $user = Yii::$app->user->identity;
+            $userAddress = $user->getAddress();
+
+            $order->firstname = $user->firstname;
+            $order->lastname = $user->lastname;
+            $order->email = $user->email;
+            $order->status = Order::STATUS_DRAFT;
+
+            $orderAddress->address = $userAddress->address;
+            $orderAddress->city = $userAddress->city;
+            $orderAddress->user_id = Yii::$app->user->id;
+            $orderAddress->state = $userAddress->state;
+            $orderAddress->country = $userAddress->country;
+            $orderAddress->zipcode = $userAddress->zipcode;
+        }
+
+        $productQuantity = CartItem::getTotalQuantityForUser(Yii::$app->user->id);
+        $totalPrice = CartItem::getTotalPriceForUser(Yii::$app->user->id);
+
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde
         return $this->render('checkout', [
             'order' => $order,
             'cartItems' => $cartItems,
         ]);
     }
+<<<<<<< HEAD
     
     
 
 }
+=======
+
+
+
+}
+>>>>>>> 88503521a696b05b095162bdc09a73eee8540dde

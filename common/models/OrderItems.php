@@ -16,7 +16,7 @@ use Yii;
  *
  * @property Orders $order
  */
-class OrderItem extends \yii\db\ActiveRecord
+class OrderItems extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -37,8 +37,7 @@ class OrderItem extends \yii\db\ActiveRecord
             [['product_id', 'order_id', 'quantity'], 'integer'],
             [['unit_price'], 'number'],
             [['product_name'], 'string', 'max' => 255],
-            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['order_id' => 'id']],
-            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
+            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Orders::class, 'targetAttribute' => ['order_id' => 'id']],
         ];
     }
 
@@ -64,12 +63,7 @@ class OrderItem extends \yii\db\ActiveRecord
      */
     public function getOrder()
     {
-        return $this->hasOne(Order::class, ['id' => 'order_id']);
-    }
-    public function getProduct()
-    {
-        // return $this->hasOne(Products::className(), ['id' => 'product_id']);
-        return $this->hasOne(Product::className(), ['id' => 'product_id']);
+        return $this->hasOne(Orders::class, ['id' => 'order_id']);
     }
 
     /**

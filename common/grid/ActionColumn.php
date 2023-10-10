@@ -1,9 +1,4 @@
 <?php
-/**
- * User: TheCodeholic
- * Date: 11/28/2020
- * Time: 9:45 AM
- */
 
 namespace common\grid;
 
