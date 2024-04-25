@@ -14,6 +14,9 @@ class m201124_064118_create_products_table extends Migration
     /**
      * {@inheritdoc}
      */
+    public function test(){
+
+    }
     public function safeUp()
     {
         $this->createTable('{{products}}', [
